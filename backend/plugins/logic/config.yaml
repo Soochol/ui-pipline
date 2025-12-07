@@ -1,0 +1,92 @@
+plugin:
+  id: "logic"
+  name: "Logic Control"
+  version: "1.0.0"
+  author: "UI Pipeline Team"
+  description: "Logic control nodes for pipeline flow control"
+  category: "Logic"
+  color: "#9b59b6"
+
+device:
+  class: "LogicDevice"
+  connection_types:
+    - virtual
+
+  instance_config: []
+
+functions:
+  - id: "delay"
+    name: "Delay"
+    description: "Wait for a specified duration"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Start delay"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Delay complete"
+
+  - id: "branch"
+    name: "Branch"
+    description: "Conditional branching based on boolean condition"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute branch"
+
+      - name: "condition"
+        type: "boolean"
+        description: "Branch condition"
+
+    outputs:
+      - name: "true"
+        type: "trigger"
+        description: "Condition is true"
+
+      - name: "false"
+        type: "trigger"
+        description: "Condition is false"
+
+  - id: "print"
+    name: "Print"
+    description: "Print a message to console/log"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute print"
+
+      - name: "message"
+        type: "string"
+        description: "Message to print"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Print complete"
+
+  - id: "set_variable"
+    name: "Set Variable"
+    description: "Set a variable value"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute set"
+
+      - name: "value"
+        type: "any"
+        description: "Value to set"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Set complete"
+
+      - name: "value"
+        type: "any"
+        description: "The set value"

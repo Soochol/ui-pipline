@@ -1,0 +1,59 @@
+{
+  "pipeline": {
+    "pipeline_id": "test_simple_pipeline",
+    "name": "Simple Test Pipeline",
+    "nodes": [
+      {
+        "id": "node_home",
+        "type": "function",
+        "plugin_id": "mock_servo",
+        "device_instance": "servo_1",
+        "function_id": "home",
+        "config": {},
+        "position": {"x": 100, "y": 100}
+      },
+      {
+        "id": "node_move",
+        "type": "function",
+        "plugin_id": "mock_servo",
+        "device_instance": "servo_1",
+        "function_id": "move",
+        "config": {"speed": 100.0},
+        "position": {"x": 300, "y": 100}
+      },
+      {
+        "id": "node_get_pos",
+        "type": "function",
+        "plugin_id": "mock_servo",
+        "device_instance": "servo_1",
+        "function_id": "get_position",
+        "config": {},
+        "position": {"x": 500, "y": 100}
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge_1",
+        "source": "node_home",
+        "source_handle": "complete",
+        "target": "node_move",
+        "target_handle": "trigger"
+      },
+      {
+        "id": "edge_2",
+        "source": "node_home",
+        "source_handle": "position",
+        "target": "node_move",
+        "target_handle": "position"
+      },
+      {
+        "id": "edge_3",
+        "source": "node_move",
+        "source_handle": "complete",
+        "target": "node_get_pos",
+        "target_handle": "trigger"
+      }
+    ],
+    "variables": {}
+  }
+}

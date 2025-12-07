@@ -1,0 +1,93 @@
+plugin:
+  id: "mock_servo"
+  name: "Mock Servo Motor"
+  version: "1.0.0"
+  author: "UI Pipeline Team"
+  description: "Mock servo motor for testing pipeline system"
+  category: "Motion Control"
+  color: "#4a9eff"
+
+device:
+  class: "MockServoDevice"
+  connection_types:
+    - mock
+
+  instance_config:
+    - name: "axis"
+      type: "integer"
+      default: 0
+      description: "Servo axis number"
+
+    - name: "max_position"
+      type: "number"
+      default: 1000.0
+      description: "Maximum position (mm)"
+
+functions:
+  - id: "home"
+    name: "Home Axis"
+    description: "Home the servo motor to zero position"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute homing"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Homing complete"
+
+      - name: "position"
+        type: "number"
+        unit: "mm"
+        description: "Current position after homing"
+
+  - id: "move"
+    name: "Move to Position"
+    description: "Move servo to target position"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute move"
+
+      - name: "position"
+        type: "number"
+        unit: "mm"
+        description: "Target position"
+
+      - name: "speed"
+        type: "number"
+        unit: "mm/s"
+        description: "Movement speed"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Move complete"
+
+      - name: "position"
+        type: "number"
+        unit: "mm"
+        description: "Current position"
+
+  - id: "get_position"
+    name: "Get Position"
+    description: "Get current servo position"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Read position"
+
+    outputs:
+      - name: "position"
+        type: "number"
+        unit: "mm"
+        description: "Current position"
+
+      - name: "velocity"
+        type: "number"
+        unit: "mm/s"
+        description: "Current velocity"

@@ -1,0 +1,38 @@
+{
+  "pipeline": {
+    "pipeline_id": "test_events_001",
+    "name": "Event Test Pipeline",
+    "nodes": [
+      {
+        "id": "node_1",
+        "type": "function",
+        "plugin_id": "mock_servo",
+        "device_instance": "servo_final",
+        "function_id": "home",
+        "config": {},
+        "position": {"x": 100, "y": 100}
+      },
+      {
+        "id": "node_2",
+        "type": "function",
+        "plugin_id": "mock_servo",
+        "device_instance": "servo_final",
+        "function_id": "move",
+        "config": {
+          "position": 100
+        },
+        "position": {"x": 300, "y": 100}
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge_1",
+        "source": "node_1",
+        "target": "node_2",
+        "source_handle": "complete",
+        "target_handle": "trigger"
+      }
+    ],
+    "variables": {}
+  }
+}

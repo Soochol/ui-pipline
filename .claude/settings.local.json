@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m venv:*)",
+      "Bash(venvScriptspip install -r requirements.txt)",
+      "Bash(venv/Scripts/pip install:*)",
+      "Bash(npm run build:*)",
+      "Bash(dir:*)",
+      "Bash(cmd /c npm run build)",
+      "Bash(cmd /c \"cd /d c:\\code\\ui-pipline\\frontend & npm run build\")",
+      "Bash(cmd /c \"cd c:\\code\\ui-pipline\\frontend && npm run build 2>&1\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

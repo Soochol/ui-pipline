@@ -1,0 +1,169 @@
+{
+  "composite_id": "composite_089f245e",
+  "name": "test",
+  "description": "Composite created from 3 nodes",
+  "subgraph": {
+    "nodes": [
+      {
+        "id": "node_1",
+        "type": "functionNode",
+        "position": {
+          "x": 100,
+          "y": 100
+        },
+        "data": {
+          "label": "Home Servo",
+          "pluginId": "mock_servo",
+          "functionId": "home",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [
+            {
+              "name": "trigger",
+              "type": "trigger"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "complete",
+              "type": "trigger"
+            },
+            {
+              "name": "position",
+              "type": "number"
+            }
+          ],
+          "category": "Motion",
+          "color": "#007acc"
+        }
+      },
+      {
+        "id": "node_2",
+        "type": "functionNode",
+        "position": {
+          "x": 400,
+          "y": 100
+        },
+        "data": {
+          "label": "Move Absolute",
+          "pluginId": "mock_servo",
+          "functionId": "move_absolute",
+          "nodeType": "function",
+          "config": {
+            "target": 100,
+            "speed": 50
+          },
+          "inputs": [
+            {
+              "name": "trigger",
+              "type": "trigger"
+            },
+            {
+              "name": "target",
+              "type": "number"
+            },
+            {
+              "name": "speed",
+              "type": "number"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "complete",
+              "type": "trigger"
+            },
+            {
+              "name": "position",
+              "type": "number"
+            }
+          ],
+          "category": "Motion",
+          "color": "#007acc"
+        }
+      },
+      {
+        "id": "node_3",
+        "type": "functionNode",
+        "position": {
+          "x": 700,
+          "y": 100
+        },
+        "data": {
+          "label": "Get Position",
+          "pluginId": "mock_servo",
+          "functionId": "get_position",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [
+            {
+              "name": "trigger",
+              "type": "trigger"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "position",
+              "type": "number"
+            },
+            {
+              "name": "status",
+              "type": "string"
+            }
+          ],
+          "category": "Motion",
+          "color": "#007acc"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e2",
+        "source": "node_2",
+        "target": "node_3",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep",
+        "selected": true
+      },
+      {
+        "id": "enode_1-node_2-1765114084556",
+        "source": "node_1",
+        "target": "node_2",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep",
+        "animated": false,
+        "selected": true
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "trigger",
+      "type": "trigger",
+      "maps_to": "node_1.trigger",
+      "description": "",
+      "default_value": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "position",
+      "type": "number",
+      "maps_from": "node_3.position",
+      "description": ""
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "maps_from": "node_3.status",
+      "description": ""
+    }
+  ],
+  "category": "Composite",
+  "color": "#9b59b6",
+  "author": "",
+  "version": "1.0.0",
+  "created_at": "2025-12-07T22:28:51.242163",
+  "updated_at": "2025-12-07T22:28:51.242204"
+}

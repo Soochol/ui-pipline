@@ -1,0 +1,14 @@
+{
+  "composite_089f245e": {
+    "id": "composite_089f245e",
+    "name": "test",
+    "category": "Composite",
+    "color": "#9b59b6",
+    "version": "1.0.0",
+    "author": "",
+    "input_count": 1,
+    "output_count": 2,
+    "created_at": "2025-12-07T22:28:51.242163",
+    "updated_at": "2025-12-07T22:28:51.242204"
+  }
+}

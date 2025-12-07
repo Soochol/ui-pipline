@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Theme CSS Variables - Dark Theme (default) */
+:root {
+  /* Background colors */
+  --color-bg-primary: #1e1e1e;
+  --color-bg-secondary: #252526;
+  --color-bg-tertiary: #2d2d2d;
+  --color-bg-hover: #2a2d2e;
+
+  /* Border colors */
+  --color-border-default: #3e3e42;
+  --color-border-active: #007acc;
+
+  /* Text colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #cccccc;
+  --color-text-muted: #888888;
+  --color-text-disabled: #6b7280;
+
+  /* Action colors */
+  --color-action-primary: #007acc;
+  --color-action-primary-hover: #005a9e;
+  --color-action-success: #4ade80;
+  --color-action-warning: #fbbf24;
+  --color-action-error: #ef4444;
+  --color-action-info: #4a9eff;
+
+  /* Data type colors */
+  --color-datatype-trigger: #ffffff;
+  --color-datatype-number: #4a9eff;
+  --color-datatype-string: #ffd700;
+  --color-datatype-boolean: #4ade80;
+  --color-datatype-image: #ef4444;
+  --color-datatype-any: #888888;
+
+  /* Category colors */
+  --color-category-motion: #007acc;
+  --color-category-io: #4ade80;
+  --color-category-vision: #ef4444;
+  --color-category-logic: #fbbf24;
+  --color-category-math: #a855f7;
+  --color-category-string: #f97316;
+  --color-category-array: #06b6d4;
+  --color-category-variable: #64748b;
+  --color-category-comment: #475569;
+  --color-category-default: #6b7280;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  /* Background colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f3f4f6;
+  --color-bg-tertiary: #e5e7eb;
+  --color-bg-hover: #f9fafb;
+
+  /* Border colors */
+  --color-border-default: #d1d5db;
+  --color-border-active: #007acc;
+
+  /* Text colors */
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #9ca3af;
+  --color-text-disabled: #d1d5db;
+
+  /* Action colors remain same for visibility */
+  --color-action-primary: #007acc;
+  --color-action-primary-hover: #005a9e;
+  --color-action-success: #22c55e;
+  --color-action-warning: #f59e0b;
+  --color-action-error: #dc2626;
+  --color-action-info: #3b82f6;
+
+  /* Data type colors remain same for consistency */
+  /* Category colors remain same for consistency */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* React Flow custom styles will be added in Day 14-15 */

@@ -1,0 +1,77 @@
+# Plugin Template Configuration
+# Copy this folder and modify for your custom device plugin
+
+plugin:
+  id: "example_device"
+  name: "Example Device"
+  version: "1.0.0"
+  author: "Your Name"
+  description: "Template for creating custom device plugins"
+  category: "Templates"
+  color: "#888888"
+
+device:
+  # Class name in device.py
+  class: "ExampleDevice"
+
+  # Connection types this device supports
+  connection_types:
+    - serial
+    - ethernet
+
+  # Instance configuration parameters
+  instance_config:
+    - name: "port"
+      type: "string"
+      default: "COM1"
+      description: "Serial port or IP address"
+
+    - name: "baudrate"
+      type: "integer"
+      default: 9600
+      options: [9600, 19200, 38400, 57600, 115200]
+      description: "Communication speed"
+
+# Function definitions
+functions:
+  - id: "read_value"
+    name: "Read Value"
+    description: "Read current sensor value"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute read operation"
+
+    outputs:
+      - name: "value"
+        type: "number"
+        unit: "units"
+        description: "Sensor reading"
+
+      - name: "timestamp"
+        type: "number"
+        unit: "seconds"
+        description: "Unix timestamp"
+
+  - id: "write_value"
+    name: "Write Value"
+    description: "Write value to device"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute write"
+
+      - name: "value"
+        type: "number"
+        description: "Value to write"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Operation complete"
+
+      - name: "success"
+        type: "boolean"
+        description: "Write successful"
