@@ -137,7 +137,7 @@ class FunctionExecuteResponse(BaseModel):
 # Pipeline Storage Models
 class PipelineSaveRequest(BaseModel):
     """Request to save a pipeline."""
-    pipeline: PipelineDefinition
+    pipeline: Dict[str, Any]  # Flexible format to support frontend node/edge formats
 
 
 class PipelineSaveResponse(BaseModel):
@@ -163,7 +163,7 @@ class PipelineListResponse(BaseModel):
 
 class PipelineGetResponse(BaseModel):
     """Single pipeline response."""
-    pipeline: PipelineDefinition
+    pipeline: Dict[str, Any]  # Flexible format to support both backend and frontend formats
 
 
 class PipelineDeleteResponse(BaseModel):

@@ -1,7 +1,7 @@
 """Base function class for all device functions."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Callable, List
 from .base_device import BaseDevice
 
 
@@ -21,6 +21,30 @@ class BaseFunction(ABC):
             device_instance: The device instance this function operates on
         """
         self.device_instance = device_instance
+        self._log_callback: Optional[Callable[[str, str], None]] = None
+        self._logs: List[Dict[str, str]] = []
+
+    def set_log_callback(self, callback: Callable[[str, str], None]):
+        """Set callback for log messages. Callback receives (message, level)."""
+        self._log_callback = callback
+
+    def log(self, message: str, level: str = "info"):
+        """
+        Log a message that will be sent to frontend console.
+
+        Args:
+            message: Log message
+            level: Log level (info, warning, error, debug)
+        """
+        self._logs.append({"message": message, "level": level})
+        if self._log_callback:
+            self._log_callback(message, level)
+
+    def get_logs(self) -> List[Dict[str, str]]:
+        """Get all logs and clear the buffer."""
+        logs = self._logs.copy()
+        self._logs = []
+        return logs
 
     @abstractmethod
     async def execute(self, inputs: Dict[str, Any]) -> Dict[str, Any]:

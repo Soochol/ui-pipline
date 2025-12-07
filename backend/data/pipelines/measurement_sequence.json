@@ -1,0 +1,314 @@
+{
+  "pipeline_id": "measurement_sequence",
+  "name": "Measurement Sequence",
+  "created_at": "2025-12-08T00:00:00",
+  "updated_at": "2025-12-08T00:00:00",
+  "data": {
+    "pipeline_id": "measurement_sequence",
+    "name": "Measurement Sequence",
+    "description": "Power Supply, Loadcell, Servo Motor measurement sequence",
+    "nodes": [
+      {
+        "id": "power_connect",
+        "type": "functionNode",
+        "position": { "x": 100, "y": 100 },
+        "data": {
+          "label": "Power Connect",
+          "pluginId": "power_supply",
+          "functionId": "connect",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [{ "name": "trigger", "type": "trigger" }],
+          "outputs": [
+            { "name": "complete", "type": "trigger" },
+            { "name": "connected", "type": "boolean" }
+          ],
+          "category": "Power",
+          "color": "#f59e0b"
+        }
+      },
+      {
+        "id": "loadcell_connect",
+        "type": "functionNode",
+        "position": { "x": 100, "y": 250 },
+        "data": {
+          "label": "Loadcell Connect",
+          "pluginId": "loadcell",
+          "functionId": "connect",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [{ "name": "trigger", "type": "trigger" }],
+          "outputs": [
+            { "name": "complete", "type": "trigger" },
+            { "name": "connected", "type": "boolean" }
+          ],
+          "category": "Loadcell",
+          "color": "#10b981"
+        }
+      },
+      {
+        "id": "servo_home",
+        "type": "functionNode",
+        "position": { "x": 100, "y": 400 },
+        "data": {
+          "label": "Servo Home",
+          "pluginId": "mock_servo",
+          "functionId": "home",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [{ "name": "trigger", "type": "trigger" }],
+          "outputs": [
+            { "name": "complete", "type": "trigger" },
+            { "name": "position", "type": "number" }
+          ],
+          "category": "Motion Control",
+          "color": "#4a9eff"
+        }
+      },
+      {
+        "id": "power_on",
+        "type": "functionNode",
+        "position": { "x": 400, "y": 100 },
+        "data": {
+          "label": "Power On",
+          "pluginId": "power_supply",
+          "functionId": "power_on",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [{ "name": "trigger", "type": "trigger" }],
+          "outputs": [
+            { "name": "complete", "type": "trigger" },
+            { "name": "output_on", "type": "boolean" }
+          ],
+          "category": "Power",
+          "color": "#f59e0b"
+        }
+      },
+      {
+        "id": "set_voltage",
+        "type": "functionNode",
+        "position": { "x": 700, "y": 100 },
+        "data": {
+          "label": "Set Voltage",
+          "pluginId": "power_supply",
+          "functionId": "set_voltage",
+          "nodeType": "function",
+          "config": { "voltage": 12.0 },
+          "inputs": [
+            { "name": "trigger", "type": "trigger" },
+            { "name": "voltage", "type": "number" }
+          ],
+          "outputs": [
+            { "name": "complete", "type": "trigger" },
+            { "name": "actual_voltage", "type": "number" }
+          ],
+          "category": "Power",
+          "color": "#f59e0b"
+        }
+      },
+      {
+        "id": "servo_move",
+        "type": "functionNode",
+        "position": { "x": 1000, "y": 250 },
+        "data": {
+          "label": "Servo Move",
+          "pluginId": "mock_servo",
+          "functionId": "move",
+          "nodeType": "function",
+          "config": { "position": 50.0, "speed": 100.0 },
+          "inputs": [
+            { "name": "trigger", "type": "trigger" },
+            { "name": "position", "type": "number" },
+            { "name": "speed", "type": "number" }
+          ],
+          "outputs": [
+            { "name": "complete", "type": "trigger" },
+            { "name": "position", "type": "number" }
+          ],
+          "category": "Motion Control",
+          "color": "#4a9eff"
+        }
+      },
+      {
+        "id": "get_loadcell",
+        "type": "functionNode",
+        "position": { "x": 1300, "y": 250 },
+        "data": {
+          "label": "Get Loadcell",
+          "pluginId": "loadcell",
+          "functionId": "get_value",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [{ "name": "trigger", "type": "trigger" }],
+          "outputs": [
+            { "name": "complete", "type": "trigger" },
+            { "name": "value", "type": "number" },
+            { "name": "unit", "type": "string" },
+            { "name": "stable", "type": "boolean" }
+          ],
+          "category": "Loadcell",
+          "color": "#10b981"
+        }
+      },
+      {
+        "id": "evaluate",
+        "type": "functionNode",
+        "position": { "x": 1600, "y": 250 },
+        "data": {
+          "label": "Evaluate",
+          "pluginId": "loadcell",
+          "functionId": "evaluate",
+          "nodeType": "function",
+          "config": { "spec_min": 45.0, "spec_max": 55.0 },
+          "inputs": [
+            { "name": "trigger", "type": "trigger" },
+            { "name": "value", "type": "number" },
+            { "name": "spec_min", "type": "number" },
+            { "name": "spec_max", "type": "number" }
+          ],
+          "outputs": [
+            { "name": "pass", "type": "trigger" },
+            { "name": "fail", "type": "trigger" },
+            { "name": "result", "type": "string" },
+            { "name": "value", "type": "number" }
+          ],
+          "category": "Loadcell",
+          "color": "#10b981"
+        }
+      },
+      {
+        "id": "servo_return",
+        "type": "functionNode",
+        "position": { "x": 1900, "y": 250 },
+        "data": {
+          "label": "Servo Return",
+          "pluginId": "mock_servo",
+          "functionId": "move",
+          "nodeType": "function",
+          "config": { "position": 0.0, "speed": 100.0 },
+          "inputs": [
+            { "name": "trigger", "type": "trigger" },
+            { "name": "position", "type": "number" },
+            { "name": "speed", "type": "number" }
+          ],
+          "outputs": [
+            { "name": "complete", "type": "trigger" },
+            { "name": "position", "type": "number" }
+          ],
+          "category": "Motion Control",
+          "color": "#4a9eff"
+        }
+      },
+      {
+        "id": "power_off",
+        "type": "functionNode",
+        "position": { "x": 2200, "y": 100 },
+        "data": {
+          "label": "Power Off",
+          "pluginId": "power_supply",
+          "functionId": "power_off",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [{ "name": "trigger", "type": "trigger" }],
+          "outputs": [
+            { "name": "complete", "type": "trigger" },
+            { "name": "output_on", "type": "boolean" }
+          ],
+          "category": "Power",
+          "color": "#f59e0b"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "source": "power_connect",
+        "target": "power_on",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e2",
+        "source": "power_on",
+        "target": "set_voltage",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e3",
+        "source": "loadcell_connect",
+        "target": "get_loadcell",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e4",
+        "source": "servo_home",
+        "target": "servo_move",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e5",
+        "source": "set_voltage",
+        "target": "servo_move",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e6",
+        "source": "servo_move",
+        "target": "get_loadcell",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e7",
+        "source": "get_loadcell",
+        "target": "evaluate",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e8",
+        "source": "get_loadcell",
+        "target": "evaluate",
+        "sourceHandle": "value",
+        "targetHandle": "value",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e9",
+        "source": "evaluate",
+        "target": "servo_return",
+        "sourceHandle": "pass",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e10",
+        "source": "evaluate",
+        "target": "servo_return",
+        "sourceHandle": "fail",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      },
+      {
+        "id": "e11",
+        "source": "servo_return",
+        "target": "power_off",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "smoothstep"
+      }
+    ],
+    "variables": {}
+  }
+}

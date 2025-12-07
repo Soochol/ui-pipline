@@ -13,7 +13,8 @@ import { Node, Edge } from 'reactflow';
 export function getLayoutedElements(
   nodes: Node[],
   edges: Edge[],
-  direction: 'TB' | 'LR' = 'LR'
+  direction: 'TB' | 'LR' = 'LR',
+  viewportCenter?: { x: number; y: number }
 ): { nodes: Node[]; edges: Edge[] } {
   if (nodes.length === 0) return { nodes, edges };
 
@@ -22,9 +23,9 @@ export function getLayoutedElements(
   const horizontalSpacing = 100;
   const verticalSpacing = 80;
 
-  // Calculate original center point of all nodes
-  const originalCenterX = nodes.reduce((sum, n) => sum + n.position.x, 0) / nodes.length;
-  const originalCenterY = nodes.reduce((sum, n) => sum + n.position.y, 0) / nodes.length;
+  // Use viewport center if provided, otherwise calculate from existing nodes
+  const targetCenterX = viewportCenter?.x ?? nodes.reduce((sum, n) => sum + n.position.x, 0) / nodes.length;
+  const targetCenterY = viewportCenter?.y ?? nodes.reduce((sum, n) => sum + n.position.y, 0) / nodes.length;
 
   // Build adjacency map
   const incomingEdges = new Map<string, string[]>();
@@ -136,9 +137,9 @@ export function getLayoutedElements(
   const layoutCenterX = layoutedNodes.reduce((sum, n) => sum + n.position.x, 0) / layoutedNodes.length;
   const layoutCenterY = layoutedNodes.reduce((sum, n) => sum + n.position.y, 0) / layoutedNodes.length;
 
-  // Apply offset to center layout on original position
-  const offsetX = originalCenterX - layoutCenterX;
-  const offsetY = originalCenterY - layoutCenterY;
+  // Apply offset to center layout on target position (viewport or original)
+  const offsetX = targetCenterX - layoutCenterX;
+  const offsetY = targetCenterY - layoutCenterY;
 
   layoutedNodes.forEach(node => {
     node.position.x += offsetX;

@@ -124,6 +124,7 @@ export type WebSocketEventType =
   | "pipeline_started"
   | "node_executing"
   | "node_completed"
+  | "node_log"
   | "pipeline_completed"
   | "pipeline_error"
   | "ack";
@@ -163,6 +164,16 @@ export interface NodeCompletedEvent extends WebSocketEvent {
   label: string;
   outputs: Record<string, any>;
   execution_time: number;
+  timestamp: string;
+}
+
+export interface NodeLogEvent extends WebSocketEvent {
+  type: "node_log";
+  pipeline_id: string;
+  node_id: string;
+  label: string;
+  message: string;
+  level: "info" | "warning" | "error" | "debug";
   timestamp: string;
 }
 

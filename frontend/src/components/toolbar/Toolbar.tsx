@@ -105,33 +105,21 @@ export const Toolbar: React.FC = () => {
   const loadPipelineDirectly = (pipelineId: string, pipelineName: string) => {
     loadPipeline(pipelineId, {
       onSuccess: (pipelineData) => {
-        // Convert backend node format to frontend format
+        // Nodes and edges are saved in frontend format, restore directly
         const loadedNodes = pipelineData.nodes.map((node: any) => ({
           id: node.id,
-          type: 'functionNode',
+          type: node.type || 'functionNode',
           position: node.position,
-          data: {
-            label: node.label,
-            pluginId: node.plugin_id,
-            functionId: node.function_id,
-            instanceId: node.instance_id,
-            nodeType: 'function',
-            config: node.config || {},
-            inputs: [],
-            outputs: [],
-            category: '',
-            color: '#007acc',
-          },
+          data: node.data,
         }));
 
-        // Convert backend edge format to frontend format
         const loadedEdges = pipelineData.edges.map((edge: any) => ({
           id: edge.id,
           source: edge.source,
           target: edge.target,
-          sourceHandle: edge.source_handle,
-          targetHandle: edge.target_handle,
-          type: 'smoothstep',
+          sourceHandle: edge.sourceHandle,
+          targetHandle: edge.targetHandle,
+          type: edge.type || 'smoothstep',
         }));
 
         setNodes(loadedNodes as PipelineNode[]);

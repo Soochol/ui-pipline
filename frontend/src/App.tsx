@@ -17,6 +17,7 @@ import type {
   PipelineStartedEvent,
   NodeExecutingEvent,
   NodeCompletedEvent,
+  NodeLogEvent,
   PipelineCompletedEvent,
   PipelineErrorEvent,
 } from './types';
@@ -131,6 +132,17 @@ function App() {
           });
           setRunning(false);
           setPipelineId(null);
+          break;
+        }
+
+        case 'node_log': {
+          const logEvent = event as NodeLogEvent;
+          // Map 'debug' to 'info' since ConsoleLog doesn't have 'debug' level
+          const level = logEvent.level === 'debug' ? 'info' : logEvent.level;
+          addConsoleLog({
+            level: level as 'info' | 'warning' | 'error' | 'success',
+            message: `[${logEvent.label}] ${logEvent.message}`,
+          });
           break;
         }
 

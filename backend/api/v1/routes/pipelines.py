@@ -67,7 +67,7 @@ async def save_pipeline(
 ):
     """Save a pipeline."""
     try:
-        pipeline_def = request.pipeline.model_dump()
+        pipeline_def = request.pipeline  # Already a dict now
         result = await use_case.execute(pipeline_def)
         return PipelineSaveResponse(**result)
     except ValueError as e:

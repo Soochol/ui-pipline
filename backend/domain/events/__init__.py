@@ -10,6 +10,7 @@ from .pipeline_events import (
     PipelineStartedEvent,
     NodeExecutingEvent,
     NodeCompletedEvent,
+    NodeLogEvent,
     PipelineCompletedEvent,
     PipelineErrorEvent
 )
@@ -23,6 +24,7 @@ __all__ = [
     "PipelineStartedEvent",
     "NodeExecutingEvent",
     "NodeCompletedEvent",
+    "NodeLogEvent",
     "PipelineCompletedEvent",
     "PipelineErrorEvent",
 ]

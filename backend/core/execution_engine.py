@@ -705,8 +705,12 @@ class ExecutionEngine:
         logger.info(f"Node {node_id} inputs: {inputs}")
 
         # Handle logic plugin functions directly (no device instance needed)
-        if plugin_id == "logic" or not instance_id:
+        if plugin_id == "logic":
             return await self._execute_logic_function(function_id, inputs)
+
+        # If no instance_id, try to execute plugin function directly (stateless)
+        if not instance_id:
+            return await self._execute_plugin_function_direct(plugin_id, function_id, inputs)
 
         # Execute function via device manager
         try:
@@ -720,6 +724,93 @@ class ExecutionEngine:
         except Exception as e:
             logger.error(f"Error executing function '{function_id}' on node '{node_id}': {e}")
             raise
+
+    async def _execute_plugin_function_direct(
+        self,
+        plugin_id: str,
+        function_id: str,
+        inputs: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Execute plugin function directly without device instance.
+
+        This is useful for stateless operations or when testing.
+        Creates a temporary device instance, executes the function, and discards it.
+
+        Args:
+            plugin_id: Plugin identifier
+            function_id: Function identifier
+            inputs: Function inputs
+
+        Returns:
+            Function outputs
+        """
+        logger.info(f"Executing plugin function directly: {plugin_id}.{function_id}")
+
+        try:
+            # Load plugin if not already loaded
+            loaded_plugin = self.plugin_loader.get_loaded_plugin(plugin_id)
+            if not loaded_plugin:
+                loaded_plugin = await self.plugin_loader.load_plugin(plugin_id)
+
+            # Get function class
+            function_classes = loaded_plugin.get("function_classes", {})
+            if function_id not in function_classes:
+                logger.warning(f"Function '{function_id}' not found in plugin '{plugin_id}'")
+                return {"complete": True}
+
+            function_class = function_classes[function_id]
+
+            # Create temporary device instance for execution
+            device_class = loaded_plugin.get("device_class")
+            if device_class:
+                # Create a temporary device with minimal config
+                temp_device = device_class(config={})
+
+                # Create function instance
+                function_instance = function_class(device=temp_device)
+
+                # Execute function
+                outputs = await function_instance.execute(inputs)
+
+                # Collect and publish logs
+                await self._publish_function_logs(function_instance, plugin_id, function_id)
+
+                return outputs
+            else:
+                # No device class, try to execute function statically
+                function_instance = function_class(device=None)
+                outputs = await function_instance.execute(inputs)
+
+                # Collect and publish logs
+                await self._publish_function_logs(function_instance, plugin_id, function_id)
+
+                return outputs
+
+        except Exception as e:
+            logger.error(f"Error executing plugin function directly: {e}")
+            return {"complete": True, "error": str(e)}
+
+    async def _publish_function_logs(
+        self,
+        function_instance,
+        plugin_id: str,
+        function_id: str
+    ):
+        """Publish any log messages from function execution."""
+        if not hasattr(function_instance, 'get_logs'):
+            return
+
+        logs = function_instance.get_logs()
+        for log_entry in logs:
+            await self._publish_event("NodeLogEvent", {
+                "pipeline_id": "direct_execution",
+                "node_id": f"{plugin_id}.{function_id}",
+                "label": f"{plugin_id}.{function_id}",
+                "timestamp": datetime.now(),
+                "message": log_entry.get("message", ""),
+                "level": log_entry.get("level", "info")
+            })
 
     async def _execute_logic_function(
         self,
@@ -917,6 +1008,7 @@ class ExecutionEngine:
                 PipelineStartedEvent,
                 NodeExecutingEvent,
                 NodeCompletedEvent,
+                NodeLogEvent,
                 PipelineCompletedEvent,
                 PipelineErrorEvent
             )
@@ -925,6 +1017,7 @@ class ExecutionEngine:
                 "PipelineStartedEvent": PipelineStartedEvent,
                 "NodeExecutingEvent": NodeExecutingEvent,
                 "NodeCompletedEvent": NodeCompletedEvent,
+                "NodeLogEvent": NodeLogEvent,
                 "PipelineCompletedEvent": PipelineCompletedEvent,
                 "PipelineErrorEvent": PipelineErrorEvent
             }

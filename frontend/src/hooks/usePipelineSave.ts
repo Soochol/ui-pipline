@@ -25,25 +25,24 @@ export interface SavePipelineResponse {
 export function usePipelineSave() {
   return useMutation({
     mutationFn: async (request: SavePipelineRequest) => {
-      const response = await apiClient.post<SavePipelineResponse>('/pipelines/save', {
+      // Save nodes and edges in frontend format for easy restoration
+      const response = await apiClient.post<SavePipelineResponse>('/api/pipelines/save', {
         pipeline: {
           pipeline_id: request.pipeline_id,
           name: request.name,
           nodes: request.nodes.map((node) => ({
             id: node.id,
-            plugin_id: node.data.pluginId,
-            function_id: node.data.functionId,
-            instance_id: node.data.instanceId,
+            type: node.type,
             position: node.position,
-            config: node.data.config || {},
-            label: node.data.label,
+            data: node.data,
           })),
           edges: request.edges.map((edge) => ({
             id: edge.id,
             source: edge.source,
             target: edge.target,
-            source_handle: edge.sourceHandle,
-            target_handle: edge.targetHandle,
+            sourceHandle: edge.sourceHandle,
+            targetHandle: edge.targetHandle,
+            type: edge.type || 'smoothstep',
           })),
           variables: {},
         },

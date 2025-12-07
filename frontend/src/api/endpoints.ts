@@ -49,7 +49,35 @@ export const api = {
   // Pipelines
   pipelines: {
     execute: (definition: PipelineDefinition) =>
-      apiClient.post<ExecutionResult>('/api/pipelines/execute', { pipeline: definition })
+      apiClient.post<ExecutionResult>('/api/pipelines/execute', { pipeline: definition }),
+
+    save: (definition: PipelineDefinition) =>
+      apiClient.post<{
+        success: boolean;
+        pipeline_id: string;
+        message: string;
+      }>('/api/pipelines/save', { pipeline: definition }),
+
+    getAll: () =>
+      apiClient.get<{
+        pipelines: Array<{
+          id: string;
+          name: string;
+          created_at: string;
+          updated_at: string;
+        }>;
+        count: number;
+      }>('/api/pipelines'),
+
+    getById: (pipelineId: string) =>
+      apiClient.get<{ pipeline: PipelineDefinition }>(`/api/pipelines/${pipelineId}`),
+
+    delete: (pipelineId: string) =>
+      apiClient.delete<{
+        success: boolean;
+        pipeline_id: string;
+        message: string;
+      }>(`/api/pipelines/${pipelineId}`)
   },
 
   // Composites

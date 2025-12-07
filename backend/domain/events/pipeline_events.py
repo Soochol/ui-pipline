@@ -102,6 +102,30 @@ class PipelineCompletedEvent:
 
 
 @dataclass
+class NodeLogEvent:
+    """Event published when a node outputs a log message."""
+
+    pipeline_id: str
+    node_id: str
+    timestamp: datetime
+    message: str
+    level: str = "info"  # info, warning, error, debug
+    label: Optional[str] = None
+
+    def to_dict(self):
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "type": "node_log",
+            "pipeline_id": self.pipeline_id,
+            "node_id": self.node_id,
+            "label": self.label or self.node_id,
+            "timestamp": self.timestamp.isoformat(),
+            "message": self.message,
+            "level": self.level
+        }
+
+
+@dataclass
 class PipelineErrorEvent:
     """Event published when pipeline execution fails."""
 

@@ -13,8 +13,13 @@ class ConnectFunction(BaseFunction):
 
     async def execute(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
         """Execute connection."""
+        self.log("Connecting to loadcell indicator...")
         device = self.get_device()
         success = await device.connect()
+        if success:
+            self.log("Loadcell connected successfully", "info")
+        else:
+            self.log("Failed to connect to loadcell", "error")
         return {
             'complete': success,
             'connected': success
@@ -54,9 +59,12 @@ class GetValueFunction(BaseFunction):
         """Execute get value."""
         device = self.get_device()
         if not device.is_connected():
+            self.log("Device not connected", "error")
             raise Exception("Device not connected")
 
+        self.log("Reading loadcell value...")
         result = await device.get_value()
+        self.log(f"Read value: {result['value']} {result['unit']} (stable: {result['stable']})")
         return {
             'complete': True,
             'value': result['value'],
@@ -103,13 +111,20 @@ class EvaluateFunction(BaseFunction):
 
         device = self.get_device()
         if not device.is_connected():
+            self.log("Device not connected", "error")
             raise Exception("Device not connected")
 
+        self.log(f"Evaluating value {inputs['value']} against spec [{inputs['spec_min']}, {inputs['spec_max']}]")
         result = device.evaluate(
             inputs['value'],
             inputs['spec_min'],
             inputs['spec_max']
         )
+
+        if result['is_pass']:
+            self.log(f"PASS: {result['value']} is within spec", "info")
+        else:
+            self.log(f"FAIL: {result['value']} is out of spec", "warning")
 
         return {
             'pass': result['is_pass'],

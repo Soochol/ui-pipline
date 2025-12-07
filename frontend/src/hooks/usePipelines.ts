@@ -41,7 +41,7 @@ export function usePipelines() {
   return useQuery({
     queryKey: ['pipelines'],
     queryFn: async () => {
-      const response = await apiClient.get<PipelineListResponse>('/pipelines');
+      const response = await apiClient.get<PipelineListResponse>('/api/pipelines');
       return response.data;
     },
   });
@@ -53,7 +53,7 @@ export function usePipelines() {
 export function useLoadPipeline() {
   return useMutation({
     mutationFn: async (pipelineId: string) => {
-      const response = await apiClient.get<PipelineGetResponse>(`/pipelines/${pipelineId}`);
+      const response = await apiClient.get<PipelineGetResponse>(`/api/pipelines/${pipelineId}`);
       return response.data.pipeline;
     },
   });
@@ -67,7 +67,7 @@ export function useDeletePipeline() {
 
   return useMutation({
     mutationFn: async (pipelineId: string) => {
-      const response = await apiClient.delete<DeletePipelineResponse>(`/pipelines/${pipelineId}`);
+      const response = await apiClient.delete<DeletePipelineResponse>(`/api/pipelines/${pipelineId}`);
       return response.data;
     },
     onSuccess: () => {

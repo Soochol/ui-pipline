@@ -57,7 +57,7 @@ export const PipelineCanvas: React.FC = () => {
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const { screenToFlowPosition, fitView } = useReactFlow();
+  const { screenToFlowPosition, fitView, getViewport } = useReactFlow();
 
   const {
     nodes: storeNodes,
@@ -625,10 +625,26 @@ export const PipelineCanvas: React.FC = () => {
   // Apply auto-layout
   const handleAutoLayout = useCallback(() => {
     saveHistory(); // Undo 지원
+
+    // Get viewport center in flow coordinates
+    const viewport = getViewport();
+    const wrapper = reactFlowWrapper.current;
+    let viewportCenter: { x: number; y: number } | undefined;
+
+    if (wrapper) {
+      const { width, height } = wrapper.getBoundingClientRect();
+      // Convert screen center to flow coordinates
+      viewportCenter = {
+        x: (-viewport.x + width / 2) / viewport.zoom,
+        y: (-viewport.y + height / 2) / viewport.zoom,
+      };
+    }
+
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       nodes,
       edges,
-      'LR' // Left-to-Right direction
+      'LR', // Left-to-Right direction
+      viewportCenter
     );
     // React Flow 로컬 상태 업데이트
     setNodes(layoutedNodes);
@@ -636,7 +652,7 @@ export const PipelineCanvas: React.FC = () => {
     // Zustand Store에도 동기화
     setStoreNodes(layoutedNodes as PipelineNode[]);
     setStoreEdges(layoutedEdges as PipelineEdge[]);
-  }, [nodes, edges, setNodes, setEdges, setStoreNodes, setStoreEdges, saveHistory]);
+  }, [nodes, edges, setNodes, setEdges, setStoreNodes, setStoreEdges, saveHistory, getViewport]);
 
   // Handle drag over
   const onDragOver = useCallback((event: React.DragEvent) => {
