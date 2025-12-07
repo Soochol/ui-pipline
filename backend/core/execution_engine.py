@@ -1,5 +1,6 @@
 """Execution engine for pipeline execution."""
 
+import asyncio
 import logging
 import time
 from datetime import datetime
@@ -99,6 +100,9 @@ class ExecutionEngine:
 
             logger.info(f"Execution order: {execution_order}")
 
+            # Group nodes by execution level for parallel execution
+            execution_levels = self._group_by_execution_level(graph, execution_order)
+
             # 🆕 Publish pipeline started event
             await self._publish_event("PipelineStartedEvent", {
                 "pipeline_id": pipeline_id,
@@ -110,36 +114,46 @@ class ExecutionEngine:
             # Clear data store
             self.data_store = {}
 
-            # Execute nodes in order
+            # Execute nodes level by level (parallel within each level)
             nodes_executed = 0
-            for node_id in execution_order:
-                node = self._find_node(node_id, pipeline_def)
-                node_label = node.get("label", node_id) if node else node_id
+            for level_idx, level_nodes in enumerate(execution_levels):
+                logger.info(f"Executing level {level_idx + 1}/{len(execution_levels)}: {len(level_nodes)} nodes in parallel")
 
-                # 🆕 Publish node executing event
-                await self._publish_event("NodeExecutingEvent", {
-                    "pipeline_id": pipeline_id,
-                    "node_id": node_id,
-                    "label": node_label,
-                    "node_type": node.get("type") if node else "unknown",
-                    "function_id": node.get("function_id") if node else None,
-                    "timestamp": datetime.now()
-                })
+                # Publish executing events for all nodes in this level
+                for node_id in level_nodes:
+                    node = self._find_node(node_id, pipeline_def)
+                    node_label = node.get("label", node_id) if node else node_id
+                    await self._publish_event("NodeExecutingEvent", {
+                        "pipeline_id": pipeline_id,
+                        "node_id": node_id,
+                        "label": node_label,
+                        "node_type": node.get("type") if node else "unknown",
+                        "function_id": node.get("function_id") if node else None,
+                        "timestamp": datetime.now()
+                    })
 
-                node_start = time.time()
-                await self._execute_node(node_id, pipeline_def)
-                node_time = time.time() - node_start
-                nodes_executed += 1
+                # Execute all nodes in this level in parallel
+                level_start = time.time()
+                await asyncio.gather(*[
+                    self._execute_node(node_id, pipeline_def)
+                    for node_id in level_nodes
+                ])
+                level_time = time.time() - level_start
 
-                # 🆕 Publish node completed event
-                await self._publish_event("NodeCompletedEvent", {
-                    "pipeline_id": pipeline_id,
-                    "node_id": node_id,
-                    "label": node_label,
-                    "timestamp": datetime.now(),
-                    "outputs": self.data_store.get(node_id, {}),
-                    "execution_time": node_time
-                })
+                # Publish completed events for all nodes in this level
+                for node_id in level_nodes:
+                    node = self._find_node(node_id, pipeline_def)
+                    node_label = node.get("label", node_id) if node else node_id
+                    await self._publish_event("NodeCompletedEvent", {
+                        "pipeline_id": pipeline_id,
+                        "node_id": node_id,
+                        "label": node_label,
+                        "timestamp": datetime.now(),
+                        "outputs": self.data_store.get(node_id, {}),
+                        "execution_time": level_time
+                    })
+
+                nodes_executed += len(level_nodes)
 
             execution_time = time.time() - start_time
 
@@ -844,6 +858,46 @@ class ExecutionEngine:
         """Clear execution results."""
         self.data_store = {}
         logger.debug("Execution results cleared")
+
+    def _group_by_execution_level(
+        self,
+        graph: nx.DiGraph,
+        execution_order: List[str]
+    ) -> List[List[str]]:
+        """
+        Group nodes by execution level for parallel execution.
+
+        Nodes in the same level have no dependencies on each other
+        and can be executed in parallel.
+
+        Args:
+            graph: Directed execution graph
+            execution_order: Topologically sorted node list
+
+        Returns:
+            List of node groups, where each group can run in parallel
+        """
+        levels = []
+        remaining = set(execution_order)
+        executed = set()
+
+        while remaining:
+            # Find nodes whose dependencies are all executed
+            current_level = [
+                node for node in remaining
+                if all(pred in executed for pred in graph.predecessors(node))
+            ]
+
+            if not current_level:
+                # Safety: if no nodes can be executed, take first remaining
+                current_level = [next(iter(remaining))]
+
+            levels.append(current_level)
+            executed.update(current_level)
+            remaining -= set(current_level)
+
+        logger.info(f"Grouped into {len(levels)} execution levels: {[len(l) for l in levels]} nodes per level")
+        return levels
 
     async def _publish_event(self, event_type: str, event_data: Dict[str, Any]):
         """

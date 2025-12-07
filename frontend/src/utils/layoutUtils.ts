@@ -22,6 +22,10 @@ export function getLayoutedElements(
   const horizontalSpacing = 100;
   const verticalSpacing = 80;
 
+  // Calculate original center point of all nodes
+  const originalCenterX = nodes.reduce((sum, n) => sum + n.position.x, 0) / nodes.length;
+  const originalCenterY = nodes.reduce((sum, n) => sum + n.position.y, 0) / nodes.length;
+
   // Build adjacency map
   const incomingEdges = new Map<string, string[]>();
   const outgoingEdges = new Map<string, string[]>();
@@ -36,19 +40,29 @@ export function getLayoutedElements(
     outgoingEdges.get(edge.source)?.push(edge.target);
   });
 
-  // Calculate node levels (depth from root)
+  // Calculate node levels using BFS (handles cycles better)
   const levels = new Map<string, number>();
-  const visited = new Set<string>();
 
-  function calculateLevel(nodeId: string, level: number) {
-    if (visited.has(nodeId)) return;
-    visited.add(nodeId);
+  function calculateLevelBFS(startNodeId: string, startLevel: number) {
+    const queue: { nodeId: string; level: number }[] = [{ nodeId: startNodeId, level: startLevel }];
 
-    const currentLevel = levels.get(nodeId) ?? -1;
-    levels.set(nodeId, Math.max(currentLevel, level));
+    while (queue.length > 0) {
+      const { nodeId, level } = queue.shift()!;
 
-    const children = outgoingEdges.get(nodeId) ?? [];
-    children.forEach(childId => calculateLevel(childId, level + 1));
+      // If already visited with a higher or equal level, skip
+      const currentLevel = levels.get(nodeId);
+      if (currentLevel !== undefined && currentLevel >= level) continue;
+
+      levels.set(nodeId, level);
+
+      const children = outgoingEdges.get(nodeId) ?? [];
+      children.forEach(childId => {
+        const childLevel = levels.get(childId);
+        if (childLevel === undefined || childLevel < level + 1) {
+          queue.push({ nodeId: childId, level: level + 1 });
+        }
+      });
+    }
   }
 
   // Find root nodes (nodes with no incoming edges)
@@ -56,12 +70,32 @@ export function getLayoutedElements(
     (incomingEdges.get(node.id)?.length ?? 0) === 0
   );
 
-  // If no root nodes, start from first node
-  if (rootNodes.length === 0 && nodes.length > 0) {
-    calculateLevel(nodes[0].id, 0);
-  } else {
-    rootNodes.forEach(node => calculateLevel(node.id, 0));
+  // Calculate levels starting from root nodes
+  if (rootNodes.length > 0) {
+    rootNodes.forEach(node => calculateLevelBFS(node.id, 0));
   }
+
+  // Handle disconnected nodes (no incoming or outgoing edges)
+  // Place them at the end
+  const maxLevel = Math.max(...Array.from(levels.values()), -1);
+  let disconnectedLevel = maxLevel + 1;
+
+  nodes.forEach(node => {
+    if (!levels.has(node.id)) {
+      const hasConnections = (incomingEdges.get(node.id)?.length ?? 0) > 0 ||
+                            (outgoingEdges.get(node.id)?.length ?? 0) > 0;
+
+      if (hasConnections) {
+        // Node is part of a disconnected subgraph, start new BFS
+        calculateLevelBFS(node.id, disconnectedLevel);
+        disconnectedLevel = Math.max(...Array.from(levels.values())) + 1;
+      } else {
+        // Completely isolated node
+        levels.set(node.id, disconnectedLevel);
+        disconnectedLevel++;
+      }
+    }
+  });
 
   // Group nodes by level
   const nodesByLevel = new Map<number, Node[]>();
@@ -73,29 +107,42 @@ export function getLayoutedElements(
     nodesByLevel.get(level)!.push(node);
   });
 
-  // Position nodes
+  // Position nodes (starting from 0,0, will offset later)
   const layoutedNodes: Node[] = [];
   const sortedLevels = Array.from(nodesByLevel.keys()).sort((a, b) => a - b);
 
-  sortedLevels.forEach(level => {
+  sortedLevels.forEach((level, levelIndex) => {
     const nodesInLevel = nodesByLevel.get(level)!;
     const levelHeight = nodesInLevel.length * (nodeHeight + verticalSpacing);
-    const startY = -levelHeight / 2;
+    const startY = (nodesInLevel.length > 1) ? -levelHeight / 2 + nodeHeight / 2 : 0;
 
     nodesInLevel.forEach((node, index) => {
       const x = direction === 'LR'
-        ? level * (nodeWidth + horizontalSpacing)
+        ? levelIndex * (nodeWidth + horizontalSpacing)
         : startY + index * (nodeHeight + verticalSpacing);
 
       const y = direction === 'LR'
         ? startY + index * (nodeHeight + verticalSpacing)
-        : level * (nodeHeight + verticalSpacing);
+        : levelIndex * (nodeHeight + verticalSpacing);
 
       layoutedNodes.push({
         ...node,
         position: { x, y }
       });
     });
+  });
+
+  // Calculate layout center point
+  const layoutCenterX = layoutedNodes.reduce((sum, n) => sum + n.position.x, 0) / layoutedNodes.length;
+  const layoutCenterY = layoutedNodes.reduce((sum, n) => sum + n.position.y, 0) / layoutedNodes.length;
+
+  // Apply offset to center layout on original position
+  const offsetX = originalCenterX - layoutCenterX;
+  const offsetY = originalCenterY - layoutCenterY;
+
+  layoutedNodes.forEach(node => {
+    node.position.x += offsetX;
+    node.position.y += offsetY;
   });
 
   return { nodes: layoutedNodes, edges };

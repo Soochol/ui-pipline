@@ -1,0 +1,181 @@
+plugin:
+  id: "power_supply"
+  name: "Power Supply"
+  version: "1.0.0"
+  author: "UI Pipeline Team"
+  description: "Power supply control for voltage and current output"
+  category: "Power"
+  color: "#f59e0b"
+
+device:
+  class: "PowerSupplyDevice"
+  connection_types:
+    - serial
+    - tcp
+    - mock
+
+  instance_config:
+    - name: "port"
+      type: "string"
+      default: "COM1"
+      description: "Serial port"
+
+    - name: "baudrate"
+      type: "integer"
+      default: 9600
+      description: "Baud rate"
+
+    - name: "max_voltage"
+      type: "number"
+      default: 30.0
+      description: "Maximum voltage (V)"
+
+    - name: "max_current"
+      type: "number"
+      default: 5.0
+      description: "Maximum current (A)"
+
+functions:
+  - id: "connect"
+    name: "Connect"
+    description: "Connect to power supply"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute connection"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Connection complete"
+
+      - name: "connected"
+        type: "boolean"
+        description: "Connection status"
+
+  - id: "disconnect"
+    name: "Disconnect"
+    description: "Disconnect from power supply"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute disconnection"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Disconnection complete"
+
+  - id: "power_on"
+    name: "Power On"
+    description: "Turn on power supply output"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute power on"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Power on complete"
+
+      - name: "output_on"
+        type: "boolean"
+        description: "Output status"
+
+  - id: "power_off"
+    name: "Power Off"
+    description: "Turn off power supply output"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute power off"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Power off complete"
+
+      - name: "output_on"
+        type: "boolean"
+        description: "Output status"
+
+  - id: "set_voltage"
+    name: "Set Voltage"
+    description: "Set output voltage"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute set voltage"
+
+      - name: "voltage"
+        type: "number"
+        unit: "V"
+        description: "Target voltage"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Set complete"
+
+      - name: "actual_voltage"
+        type: "number"
+        unit: "V"
+        description: "Actual voltage"
+
+  - id: "set_current"
+    name: "Set Current Limit"
+    description: "Set current limit"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute set current"
+
+      - name: "current"
+        type: "number"
+        unit: "A"
+        description: "Current limit"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Set complete"
+
+      - name: "actual_current"
+        type: "number"
+        unit: "A"
+        description: "Actual current limit"
+
+  - id: "get_output"
+    name: "Get Output"
+    description: "Read current output voltage and current"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Read output"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Read complete"
+
+      - name: "voltage"
+        type: "number"
+        unit: "V"
+        description: "Output voltage"
+
+      - name: "current"
+        type: "number"
+        unit: "A"
+        description: "Output current"
+
+      - name: "output_on"
+        type: "boolean"
+        description: "Output status"

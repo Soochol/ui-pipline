@@ -2,16 +2,45 @@
  * Tab Bar Component - Manages multiple pipeline tabs
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePipelineStore } from '../../store/pipelineStore';
 import { useCompositeStore } from '../../store/compositeStore';
 import { PackageIcon } from '../icons/Icons';
 
 export const TabBar: React.FC = () => {
-  const { tabs, currentTab, setCurrentTab, addTab, removeTab, renameTab } = usePipelineStore();
-  const { closeCompositeEdit } = useCompositeStore();
+  const { tabs, currentTab, setCurrentTab, addTab, removeTab, renameTab, addCompositeTab } = usePipelineStore();
+  const { editingCompositeId, closeCompositeEdit, getComposite } = useCompositeStore();
   const [editingTabId, setEditingTabId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+
+  // Handle composite double-click: open composite in a new tab
+  useEffect(() => {
+    if (!editingCompositeId) return;
+
+    // Check if tab already exists for this composite
+    const existingTab = tabs.find(tab => tab.compositeId === editingCompositeId);
+    if (existingTab) {
+      setCurrentTab(existingTab.id);
+      closeCompositeEdit();
+      return;
+    }
+
+    // Load composite data and create new tab
+    const loadAndOpenComposite = async () => {
+      const composite = await getComposite(editingCompositeId);
+      if (composite) {
+        addCompositeTab(
+          editingCompositeId,
+          composite.name,
+          composite.subgraph.nodes,
+          composite.subgraph.edges
+        );
+      }
+      closeCompositeEdit();
+    };
+
+    loadAndOpenComposite();
+  }, [editingCompositeId, tabs, setCurrentTab, closeCompositeEdit, getComposite, addCompositeTab]);
 
   const handleTabClick = (tabId: string) => {
     if (editingTabId !== tabId) {

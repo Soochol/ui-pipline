@@ -113,23 +113,28 @@ export const PipelineCanvas: React.FC = () => {
   const isUpdatingFromStore = useRef(false);
 
   // Sync React Flow state with Zustand store (one-way: store -> React Flow)
-  // Preserve current positions from React Flow state when only data changes
   React.useEffect(() => {
     isUpdatingFromStore.current = true;
     setNodes((currentNodes) => {
-      // Create a map of current positions
+      // Create a map of current positions from React Flow
       const currentPositions = new Map(
         currentNodes.map((n) => [n.id, n.position])
       );
 
-      // Update nodes while preserving positions from React Flow state
       return storeNodes.map((storeNode) => {
         const currentPosition = currentPositions.get(storeNode.id);
-        // If node exists in React Flow, preserve its current position
-        // Otherwise use the store position (for new nodes)
+
+        // If store position changed (e.g., from align), use store position
+        // Otherwise preserve React Flow position (for drag smoothness)
+        const positionChanged = currentPosition && (
+          currentPosition.x !== storeNode.position.x ||
+          currentPosition.y !== storeNode.position.y
+        );
+
         return {
           ...storeNode,
-          position: currentPosition || storeNode.position,
+          // Use store position if it changed, otherwise keep current for new nodes
+          position: positionChanged ? storeNode.position : (currentPosition || storeNode.position),
         };
       });
     });
@@ -619,14 +624,19 @@ export const PipelineCanvas: React.FC = () => {
 
   // Apply auto-layout
   const handleAutoLayout = useCallback(() => {
+    saveHistory(); // Undo 지원
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       nodes,
       edges,
       'LR' // Left-to-Right direction
     );
+    // React Flow 로컬 상태 업데이트
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
-  }, [nodes, edges, setNodes, setEdges]);
+    // Zustand Store에도 동기화
+    setStoreNodes(layoutedNodes as PipelineNode[]);
+    setStoreEdges(layoutedEdges as PipelineEdge[]);
+  }, [nodes, edges, setNodes, setEdges, setStoreNodes, setStoreEdges, saveHistory]);
 
   // Handle drag over
   const onDragOver = useCallback((event: React.DragEvent) => {

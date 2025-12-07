@@ -1,0 +1,162 @@
+{
+  "composite_id": "composite_1a6c60e2",
+  "name": "loadcell sequence",
+  "description": "Composite created from 3 nodes",
+  "subgraph": {
+    "nodes": [
+      {
+        "id": "connect_1765122223250_qwpc99tut",
+        "type": "functionNode",
+        "position": {
+          "x": 100,
+          "y": 544
+        },
+        "data": {
+          "label": "Connect",
+          "pluginId": "loadcell",
+          "functionId": "connect",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [
+            {
+              "name": "trigger",
+              "type": "trigger",
+              "description": "Execute connection"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "complete",
+              "type": "trigger",
+              "description": "Connection complete"
+            },
+            {
+              "name": "connected",
+              "type": "boolean",
+              "description": "Connection status"
+            }
+          ],
+          "color": "#6b7280"
+        }
+      },
+      {
+        "id": "get_value_1765122271044_s9s35855j",
+        "type": "functionNode",
+        "position": {
+          "x": 880,
+          "y": 512
+        },
+        "data": {
+          "label": "Get Value",
+          "pluginId": "loadcell",
+          "functionId": "get_value",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [
+            {
+              "name": "trigger",
+              "type": "trigger",
+              "description": "Read value"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "complete",
+              "type": "trigger",
+              "description": "Read complete"
+            },
+            {
+              "name": "value",
+              "type": "number",
+              "description": "Measured value"
+            },
+            {
+              "name": "unit",
+              "type": "string",
+              "description": "Unit of measurement"
+            },
+            {
+              "name": "stable",
+              "type": "boolean",
+              "description": "Stability status"
+            }
+          ],
+          "color": "#6b7280"
+        }
+      },
+      {
+        "id": "disconnect_1765122279979_rq2rl3h35",
+        "type": "functionNode",
+        "position": {
+          "x": 1008,
+          "y": 496
+        },
+        "data": {
+          "label": "Disconnect",
+          "pluginId": "loadcell",
+          "functionId": "disconnect",
+          "nodeType": "function",
+          "config": {},
+          "inputs": [
+            {
+              "name": "trigger",
+              "type": "trigger",
+              "description": "Execute disconnection"
+            }
+          ],
+          "outputs": [
+            {
+              "name": "complete",
+              "type": "trigger",
+              "description": "Disconnection complete"
+            }
+          ],
+          "color": "#6b7280"
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "econnect_1765122223250_qwpc99tut-get_value_1765122271044_s9s35855j-1765122287520",
+        "source": "connect_1765122223250_qwpc99tut",
+        "target": "get_value_1765122271044_s9s35855j",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "auto",
+        "selected": true
+      },
+      {
+        "id": "eget_value_1765122271044_s9s35855j-disconnect_1765122279979_rq2rl3h35-1765122291721",
+        "source": "get_value_1765122271044_s9s35855j",
+        "target": "disconnect_1765122279979_rq2rl3h35",
+        "sourceHandle": "complete",
+        "targetHandle": "trigger",
+        "type": "auto",
+        "selected": true
+      }
+    ]
+  },
+  "inputs": [
+    {
+      "name": "trigger",
+      "type": "trigger",
+      "maps_to": "connect_1765122223250_qwpc99tut.trigger",
+      "description": "",
+      "default_value": null
+    }
+  ],
+  "outputs": [
+    {
+      "name": "complete",
+      "type": "trigger",
+      "maps_from": "disconnect_1765122279979_rq2rl3h35.complete",
+      "description": ""
+    }
+  ],
+  "category": "Composite",
+  "color": "#9b59b6",
+  "author": "",
+  "version": "1.0.0",
+  "created_at": "2025-12-08T00:45:25.253437",
+  "updated_at": "2025-12-08T00:45:25.253513"
+}

@@ -8,7 +8,10 @@
       "Bash(dir:*)",
       "Bash(cmd /c npm run build)",
       "Bash(cmd /c \"cd /d c:\\code\\ui-pipline\\frontend & npm run build\")",
-      "Bash(cmd /c \"cd c:\\code\\ui-pipline\\frontend && npm run build 2>&1\")"
+      "Bash(cmd /c \"cd c:\\code\\ui-pipline\\frontend && npm run build 2>&1\")",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

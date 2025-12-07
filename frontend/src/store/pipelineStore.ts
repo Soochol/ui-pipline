@@ -456,70 +456,99 @@ export const usePipelineStore = create<PipelineStore>((set, get) => ({
     if (state.selectedNodes.length < 2) return;
 
     const selectedNodeObjects = state.nodes.filter(node => state.selectedNodes.includes(node.id));
-
-    let alignValue: number;
+    if (selectedNodeObjects.length < 2) return;
 
     switch (direction) {
-      case 'left':
-        alignValue = Math.min(...selectedNodeObjects.map(n => n.position.x));
+      case 'left': {
+        const leftValue = Math.min(...selectedNodeObjects.map(n => n.position.x));
+        const leftNodes = state.nodes.map(node =>
+          state.selectedNodes.includes(node.id)
+            ? { ...node, position: { ...node.position, x: leftValue } }
+            : node
+        );
         set({
-          nodes: state.nodes.map(node =>
-            state.selectedNodes.includes(node.id)
-              ? { ...node, position: { ...node.position, x: alignValue } }
-              : node
+          nodes: leftNodes,
+          tabs: state.tabs.map(tab =>
+            tab.id === state.currentTab ? { ...tab, nodes: leftNodes } : tab
           )
         });
         break;
-      case 'right':
-        alignValue = Math.max(...selectedNodeObjects.map(n => n.position.x));
+      }
+      case 'right': {
+        const rightValue = Math.max(...selectedNodeObjects.map(n => n.position.x));
+        const rightNodes = state.nodes.map(node =>
+          state.selectedNodes.includes(node.id)
+            ? { ...node, position: { ...node.position, x: rightValue } }
+            : node
+        );
         set({
-          nodes: state.nodes.map(node =>
-            state.selectedNodes.includes(node.id)
-              ? { ...node, position: { ...node.position, x: alignValue } }
-              : node
+          nodes: rightNodes,
+          tabs: state.tabs.map(tab =>
+            tab.id === state.currentTab ? { ...tab, nodes: rightNodes } : tab
           )
         });
         break;
-      case 'top':
-        alignValue = Math.min(...selectedNodeObjects.map(n => n.position.y));
+      }
+      case 'top': {
+        const topValue = Math.min(...selectedNodeObjects.map(n => n.position.y));
+        const topNodes = state.nodes.map(node =>
+          state.selectedNodes.includes(node.id)
+            ? { ...node, position: { ...node.position, y: topValue } }
+            : node
+        );
         set({
-          nodes: state.nodes.map(node =>
-            state.selectedNodes.includes(node.id)
-              ? { ...node, position: { ...node.position, y: alignValue } }
-              : node
+          nodes: topNodes,
+          tabs: state.tabs.map(tab =>
+            tab.id === state.currentTab ? { ...tab, nodes: topNodes } : tab
           )
         });
         break;
-      case 'bottom':
-        alignValue = Math.max(...selectedNodeObjects.map(n => n.position.y));
+      }
+      case 'bottom': {
+        const bottomValue = Math.max(...selectedNodeObjects.map(n => n.position.y));
+        const bottomNodes = state.nodes.map(node =>
+          state.selectedNodes.includes(node.id)
+            ? { ...node, position: { ...node.position, y: bottomValue } }
+            : node
+        );
         set({
-          nodes: state.nodes.map(node =>
-            state.selectedNodes.includes(node.id)
-              ? { ...node, position: { ...node.position, y: alignValue } }
-              : node
+          nodes: bottomNodes,
+          tabs: state.tabs.map(tab =>
+            tab.id === state.currentTab ? { ...tab, nodes: bottomNodes } : tab
           )
         });
         break;
-      case 'center-h':
+      }
+      case 'center-h': {
         const avgX = selectedNodeObjects.reduce((sum, n) => sum + n.position.x, 0) / selectedNodeObjects.length;
+        const centerHNodes = state.nodes.map(node =>
+          state.selectedNodes.includes(node.id)
+            ? { ...node, position: { ...node.position, x: avgX } }
+            : node
+        );
         set({
-          nodes: state.nodes.map(node =>
-            state.selectedNodes.includes(node.id)
-              ? { ...node, position: { ...node.position, x: avgX } }
-              : node
+          nodes: centerHNodes,
+          tabs: state.tabs.map(tab =>
+            tab.id === state.currentTab ? { ...tab, nodes: centerHNodes } : tab
           )
         });
         break;
-      case 'center-v':
+      }
+      case 'center-v': {
         const avgY = selectedNodeObjects.reduce((sum, n) => sum + n.position.y, 0) / selectedNodeObjects.length;
+        const centerVNodes = state.nodes.map(node =>
+          state.selectedNodes.includes(node.id)
+            ? { ...node, position: { ...node.position, y: avgY } }
+            : node
+        );
         set({
-          nodes: state.nodes.map(node =>
-            state.selectedNodes.includes(node.id)
-              ? { ...node, position: { ...node.position, y: avgY } }
-              : node
+          nodes: centerVNodes,
+          tabs: state.tabs.map(tab =>
+            tab.id === state.currentTab ? { ...tab, nodes: centerVNodes } : tab
           )
         });
         break;
+      }
     }
   },
 

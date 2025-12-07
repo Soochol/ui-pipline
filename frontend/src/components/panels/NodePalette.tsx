@@ -133,7 +133,7 @@ export const NodePalette: React.FC = () => {
   const [activeTab, setActiveTab] = useState<PaletteTab>('nodes');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set(['Motion', 'Logic'])
+    new Set(['Motion', 'Logic', 'Power', 'Loadcell', 'Motion Control'])
   );
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);

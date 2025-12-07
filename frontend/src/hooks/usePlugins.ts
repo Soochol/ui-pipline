@@ -11,7 +11,9 @@ export const usePlugins = () => {
     queryKey: ['plugins'],
     queryFn: async () => {
       const response = await api.plugins.getAll();
-      return response.data;
+      // API returns { plugins: [...], count: N }
+      const data = response.data as any;
+      return data.plugins || data;
     },
     staleTime: 60000, // 1 minute
     retry: 2

@@ -1,0 +1,181 @@
+plugin:
+  id: "loadcell"
+  name: "Loadcell Indicator"
+  version: "1.0.0"
+  author: "UI Pipeline Team"
+  description: "Loadcell indicator for weight/force measurement"
+  category: "Loadcell"
+  color: "#10b981"
+
+device:
+  class: "LoadcellDevice"
+  connection_types:
+    - serial
+    - tcp
+    - mock
+
+  instance_config:
+    - name: "port"
+      type: "string"
+      default: "COM2"
+      description: "Serial port"
+
+    - name: "baudrate"
+      type: "integer"
+      default: 9600
+      description: "Baud rate"
+
+    - name: "unit"
+      type: "string"
+      default: "g"
+      description: "Measurement unit (g, kg, N)"
+
+    - name: "decimal_places"
+      type: "integer"
+      default: 2
+      description: "Decimal places"
+
+functions:
+  - id: "connect"
+    name: "Connect"
+    description: "Connect to loadcell indicator"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute connection"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Connection complete"
+
+      - name: "connected"
+        type: "boolean"
+        description: "Connection status"
+
+  - id: "disconnect"
+    name: "Disconnect"
+    description: "Disconnect from loadcell indicator"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute disconnection"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Disconnection complete"
+
+  - id: "tare"
+    name: "Tare"
+    description: "Zero the loadcell"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute tare"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Tare complete"
+
+      - name: "success"
+        type: "boolean"
+        description: "Tare success"
+
+  - id: "get_value"
+    name: "Get Value"
+    description: "Read current loadcell value"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Read value"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Read complete"
+
+      - name: "value"
+        type: "number"
+        description: "Measured value"
+
+      - name: "unit"
+        type: "string"
+        description: "Unit of measurement"
+
+      - name: "stable"
+        type: "boolean"
+        description: "Stability status"
+
+  - id: "get_average"
+    name: "Get Average"
+    description: "Read averaged loadcell value"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Read average"
+
+      - name: "samples"
+        type: "integer"
+        description: "Number of samples"
+
+    outputs:
+      - name: "complete"
+        type: "trigger"
+        description: "Read complete"
+
+      - name: "value"
+        type: "number"
+        description: "Averaged value"
+
+      - name: "unit"
+        type: "string"
+        description: "Unit of measurement"
+
+      - name: "stable"
+        type: "boolean"
+        description: "Stability status"
+
+  - id: "evaluate"
+    name: "Evaluate"
+    description: "Evaluate value against spec limits"
+
+    inputs:
+      - name: "trigger"
+        type: "trigger"
+        description: "Execute evaluation"
+
+      - name: "value"
+        type: "number"
+        description: "Value to evaluate"
+
+      - name: "spec_min"
+        type: "number"
+        description: "Minimum spec"
+
+      - name: "spec_max"
+        type: "number"
+        description: "Maximum spec"
+
+    outputs:
+      - name: "pass"
+        type: "trigger"
+        description: "Evaluation passed"
+
+      - name: "fail"
+        type: "trigger"
+        description: "Evaluation failed"
+
+      - name: "result"
+        type: "string"
+        description: "Result (PASS/FAIL)"
+
+      - name: "value"
+        type: "number"
+        description: "Evaluated value"
